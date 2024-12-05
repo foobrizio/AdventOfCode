@@ -1,0 +1,2 @@
+Advent of Code is an annual programming event featuring 25 daily puzzles released every December. Each challenge is designed to test your problem-solving skills while providing a fun, festive way to improve coding techniques. This repository contains my solutions for the 2024 Advent of Code, implemented in Kotlin language. In future, I'll also add solution from previous years.
+The whole event can be found at https://adventofcode.com/
