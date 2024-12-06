@@ -74,6 +74,45 @@ class InputExtractor{
             return result
         }
 
+        fun extractDataForDay5(): Pair<Map<Int,List<Int>>, List<List<Int>>>{
+            val rawText = openFile("2024/input_day5.txt")
+            val ruleMap = extractRules(rawText)
+            val updateList = extractUpdates(rawText)
+            return Pair(ruleMap, updateList)
+        }
 
+        private fun extractRules(rawText: String): Map<Int,MutableList<Int>>{
+            val map = mutableMapOf<Int, MutableList<Int>>()
+            val ruleRegex = Regex("^\\d*\\|\\d*\$", RegexOption.MULTILINE)
+            val ruleMatches = ruleRegex.findAll(rawText)
+            ruleMatches.forEach {
+                var rule = it.groups.first()?.value
+                val splitted = rule!!.split("|")
+                val key = splitted[0].toInt()
+                val newValue = splitted[1].toInt()
+                var list:MutableList<Int> = mutableListOf()
+                if(map[key] != null)
+                    list = map[key]!!
+                list.add(newValue)
+                map[key] = list
+            }
+            return map
+        }
+
+        private fun extractUpdates(rawText: String): List<List<Int>>{
+            val updateRegex = Regex("^(\\d*,)*\\d*\$", RegexOption.MULTILINE)
+            val updateMatches = updateRegex.findAll(rawText)
+            val updateList = mutableListOf<List<Int>>()
+            updateMatches.forEach {
+                val updateRow = it.groups.first()?.value
+                if(updateRow!!.isNotEmpty()){
+                    val list = updateRow.split(",")
+                        .map { str -> str.toInt() }
+                    updateList.add(list)
+                }
+
+            }
+            return updateList
+        }
     }
 }
