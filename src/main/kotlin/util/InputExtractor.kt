@@ -17,8 +17,12 @@ class InputExtractor{
             return openFile("2024/input_day3.txt")
         }
 
-        fun extractRawInputForDay4(): String {
+        private fun extractRawInputForDay4(): String {
             return openFile("2024/input_day4.txt")
+        }
+
+        private fun extractRawInputForDay6(): String {
+            return openFile("2024/input_day6.txt")
         }
         // endregion
 
@@ -74,6 +78,7 @@ class InputExtractor{
             return result
         }
 
+        // region DAY5
         fun extractDataForDay5(): Pair<Map<Int,List<Int>>, List<List<Int>>>{
             val rawText = openFile("2024/input_day5.txt")
             val ruleMap = extractRules(rawText)
@@ -113,6 +118,21 @@ class InputExtractor{
 
             }
             return updateList
+        }
+
+        //endregion
+
+        fun extractInputForDay6(): List<CharArray>{
+            val rawText = extractRawInputForDay6()
+
+            val rows = rawText.split("\n")
+            val result = mutableListOf<CharArray>()
+            rows
+                .filter {it.length>1}
+                .forEachIndexed { index, s ->
+                    result.add(index, s.trim().toCharArray())
+                }
+            return result
         }
     }
 }
