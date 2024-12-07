@@ -124,13 +124,29 @@ class InputExtractor{
 
         fun extractInputForDay6(): List<CharArray>{
             val rawText = extractRawInputForDay6()
-
             val rows = rawText.split("\n")
             val result = mutableListOf<CharArray>()
             rows
                 .filter {it.length>1}
                 .forEachIndexed { index, s ->
                     result.add(index, s.trim().toCharArray())
+                }
+            return result
+        }
+
+        fun extractInputForDay7(): List<Pair<Long, List<Long>>>{
+            val rawText = openFile("2024/input_day7.txt")
+            val rows = rawText.split("\n")
+            val result = mutableListOf<Pair<Long,List<Long>>>()
+            rows
+                .filter {it.length>1}
+                .forEach{
+                    val splitted = it.split(":")
+                    val keyResult = splitted[0].trim().toLong()
+                    val numbers:List<Long> = splitted[1].trim()
+                        .split(" ")
+                        .map{it.toLong()}
+                    result.add(Pair(keyResult, numbers))
                 }
             return result
         }

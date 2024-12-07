@@ -5,46 +5,33 @@ import util.InputExtractor
 fun main(args: Array<String>) {
     println("Day 6 - Exercise 1")
     val guardMap = InputExtractor.extractInputForDay6()
-    val visitedPositions = countDistinctPositions(guardMap)
+    val visitedPositions = getDistinctPositions(guardMap)
+    println(visitedPositions.size)
 }
 
 
-fun countDistinctPositions(guardMap: List<CharArray>): Int{
-    var positionSet = mutableSetOf<Pair<Int,Int>>()
-    var startingSituation = findStartingSituation(guardMap)
+fun getDistinctPositions(guardMap: List<CharArray>): MutableSet<Pair<Int,Int>>{
+    val positionSet = mutableSetOf<Pair<Int,Int>>()
+    val startingSituation = findStartingSituation(guardMap)
     var position = Pair(startingSituation.first, startingSituation.second)
     var state = startingSituation.third
     positionSet.add(position)
     while(true){
         var result: Triple<Int,Int,Char> = Triple(-1,-1,'?')
-        if(state == 'W')
-            // we're out of the board
-            break;
-        else if(state == '^'){
-            // We want to go up.
-            result = stepUpOrTurn(guardMap, position)
-
-        }
-        else if(state == '>'){
-            // We want to go right
-            result = stepRightOrTurn(guardMap, position)
-        }
-        else if(state == 'v'){
-            // We want to go down
-            result = stepDownOrTurn(guardMap, position)
-        }
-        else if(state == '<'){
-            // We want to go left
-            result = stepLeftOrTurn(guardMap, position)
-        }
-        else if(state == '?'){
-            // Some unexpected error
-            break;
+        when(state){
+            'W' -> break;                                           // we're out of the board
+            '?' -> break;                                           // Some unexpected error
+            '^' -> result = stepUpOrTurn(guardMap, position)        // We want to go up.
+            '>' -> result = stepRightOrTurn(guardMap, position)     // We want to go right
+            'v' -> result = stepDownOrTurn(guardMap, position)      // We want to go down
+            '<' -> result = stepLeftOrTurn(guardMap, position)      // We want to go left
         }
         position = Pair(result.first, result.second)
         state = result.third
+        if(state != 'W')
+            positionSet.add(position)
     }
-    return positionSet.size
+    return positionSet
 }
 
 fun findStartingSituation(guardMap: List<CharArray>): Triple<Int,Int, Char>{
@@ -54,27 +41,24 @@ fun findStartingSituation(guardMap: List<CharArray>): Triple<Int,Int, Char>{
                 return Triple(row,col, it2)
         }
     }
-    return Triple(-1,-1,'-')
+    return Triple(-1,-1,'?')
 }
 
 fun stepUpOrTurn(guardMap: List<CharArray>, startingPosition: Pair<Int,Int>): Triple<Int,Int,Char>{
     val row = startingPosition.first
     val col = startingPosition.second
     guardMap[row][col]='X'
-    if(guardMap[row-1][col]=='#'){
-        //Obstacle. Let's turn
-        if(col+1 == guardMap.size){
-            // We're exiting the map
-            return Triple(row, col+1, 'W')
-        }
-        guardMap[row][col+1]='>'
-        return Triple(row, col+1, '>')
+    if(row-1< 0){
+        //We're exiting the map
+        return Triple(row-1, col, 'W')
+    }
+    else if(guardMap[row-1][col]=='#'){
+        //Obstacle. Let's turn, without making steps
+        guardMap[row][col]='>'
+        return Triple(row, col, '>')
     }
     else{
-        if(row-1 < 0){
-            //We're exiting the map
-            return Triple(row-1, col, 'W')
-        }
+        // Keep going up
         guardMap[row-1][col]='^'
         return Triple(row-1, col,'^')
     }
@@ -84,21 +68,18 @@ fun stepDownOrTurn(guardMap: List<CharArray>, startingPosition: Pair<Int,Int>): 
     val row = startingPosition.first
     val col = startingPosition.second
     guardMap[row][col]='X'
-    if(guardMap[row+1][col]=='#'){
-        //Obstacle. Let's turn
-        if(col-1 < 0){
-            // We're exiting the map
-            return Triple(row, col-1, 'W')
-        }
-        guardMap[row][col-1]='<'
-        return Triple(row, col-1, '<')
+    if(row+1 == guardMap.size){
+        //We're exiting the map
+        return Triple(row+1, col, 'W')
+    }
+    else if(guardMap[row+1][col]=='#'){
+        //Obstacle. Let's turn, without making steps
+        guardMap[row][col]='<'
+        return Triple(row, col, '<')
     }
     else{
-        if(row+1 == guardMap.size){
-            //We're exiting the map
-            return Triple(row+1, col, 'W')
-        }
-        guardMap[row-1][col]='v'
+        // Keep going down
+        guardMap[row+1][col]='v'
         return Triple(row+1, col,'v')
     }
 }
@@ -107,20 +88,17 @@ fun stepRightOrTurn(guardMap: List<CharArray>, startingPosition: Pair<Int,Int>):
     val row = startingPosition.first
     val col = startingPosition.second
     guardMap[row][col]='X'
-    if(guardMap[row][col+1]=='#'){
-        //Obstacle. Let's turn
-        if(row+1 == guardMap.size){
-            // We're exiting the map
-            return Triple(row+1, col, 'W')
-        }
-        guardMap[row+1][col]='v'
-        return Triple(row+1,col, 'v')
+    if(col+1 == guardMap[row].size){
+        //We're exiting the map
+        return Triple(row, col+1, 'W')
+    }
+    else if(guardMap[row][col+1]=='#'){
+        //Obstacle. Let's turn, without making steps
+        guardMap[row][col]='v'
+        return Triple(row,col, 'v')
     }
     else{
-        if(col+1 == guardMap[row].size){
-            //We're exiting the map
-            return Triple(row, col+1, 'W')
-        }
+        // Keep going right
         guardMap[row][col+1]='>'
         return Triple(row, col+1,'>')
     }
@@ -130,20 +108,17 @@ fun stepLeftOrTurn(guardMap: List<CharArray>, startingPosition: Pair<Int,Int>): 
     val row = startingPosition.first
     val col = startingPosition.second
     guardMap[row][col]='X'
-    if(guardMap[row][col-1]=='#'){
-        //Obstacle. Let's turn
-        if(row-1 < 0){
-            //We're exiting the map
-            return Triple(row-1, col, 'W')
-        }
-        guardMap[row-1][col]='^'
-        return Triple(row-1, col,'^')
+    if(col-1 < 0){
+        //We're exiting the map
+        return Triple(row, col-1, 'W')
+    }
+    else if(guardMap[row][col-1]=='#'){
+        //Obstacle. Let's turn, without making steps
+        guardMap[row][col]='^'
+        return Triple(row, col,'^')
     }
     else{
-        if(col-1 < 0){
-            //We're exiting the map
-            return Triple(row, col-1, 'W')
-        }
+        // Keep going left
         guardMap[row][col-1]='<'
         return Triple(row, col-1,'<')
     }

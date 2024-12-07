@@ -1,6 +1,5 @@
 package yr2024.day_05
 
-import com.sun.org.apache.xpath.internal.operations.Bool
 import util.InputExtractor
 import yr2024.day_04.countXMasOccurrences
 
